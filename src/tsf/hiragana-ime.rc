@@ -1,0 +1,35 @@
+#include <winver.h>
+#include "resource.h"
+
+#pragma code_page(65001)
+
+IDI_HIRAGANA ICON "hiragana.ico"
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION HIRAGANA_VERSION_RC
+ PRODUCTVERSION HIRAGANA_VERSION_RC
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_DLL
+ FILESUBTYPE VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104b0"
+        BEGIN
+            VALUE "CompanyName", "Hiragana IME for Windows contributors"
+            VALUE "FileDescription", "ひらがなIME (Text Services Framework)"
+            VALUE "FileVersion", HIRAGANA_VERSION_STR
+            VALUE "InternalName", "hiragana-ime"
+            VALUE "LegalCopyright", "Copyright 2017-2026 Esrille Inc.; Windows port 2026. Apache License 2.0"
+            VALUE "OriginalFilename", "hiragana-ime.dll"
+            VALUE "ProductName", "ひらがなIME for Windows"
+            VALUE "ProductVersion", HIRAGANA_VERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+END

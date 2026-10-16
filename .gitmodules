@@ -1,0 +1,6 @@
+[submodule "ibus-hiragana"]
+	path = ibus-hiragana
+	url = https://github.com/esrille/ibus-hiragana.git
+[submodule "furiganapad"]
+	path = furiganapad
+	url = https://github.com/esrille/furiganapad.git

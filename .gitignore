@@ -1,0 +1,7 @@
+# Build trees go to %LOCALAPPDATA%\HiraganaIME-build (tools\build.ps1)
+/build/
+/out/
+.vs/
+*.user
+__pycache__/
+*.pyc

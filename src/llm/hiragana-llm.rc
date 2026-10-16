@@ -1,0 +1,25 @@
+#include <windows.h>
+
+#pragma code_page(65001)
+
+1 ICON "../tsf/hiragana.ico"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION HIRAGANA_VERSION_RC
+PRODUCTVERSION HIRAGANA_VERSION_RC
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041104B0"
+        BEGIN
+            VALUE "FileDescription", "ひらがなIME LLMサーバー"
+            VALUE "FileVersion", HIRAGANA_VERSION_STR
+            VALUE "ProductName", "ひらがなIME for Windows"
+            VALUE "ProductVersion", HIRAGANA_VERSION_STR
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x411, 1200
+    END
+END
