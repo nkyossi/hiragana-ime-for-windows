@@ -24,11 +24,13 @@
 #include <filesystem>
 #include <functional>
 #include <memory>
+#include <set>
 #include <string>
 
 #include "DirectClient.h"
 #include "DisplayAttributes.h"
 #include "Engine.h"
+#include "KeyMapping.h"
 #include "RemoteModel.h"
 #include "Settings.h"
 
@@ -184,6 +186,9 @@ private:
         BOOL eaten = FALSE;
     } tested_key_;
     BOOL test_key(ITfContext* context, WPARAM wparam, LPARAM lparam, bool release);
+    // Applies the key-swaps setting to k; returns true if the key was swapped.
+    bool swap_key(WPARAM wparam, bool release, KeyEvent& k);
+    std::set<WPARAM> swapped_keys_;  // swapped keys that are down
     BOOL process_key(ITfContext* context, WPARAM wparam, LPARAM lparam, bool release);
 
     Settings settings_;

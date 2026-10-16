@@ -7,47 +7,49 @@ IDI_SETUP ICON "../tsf/hiragana.ico"
 
 1 RT_MANIFEST "setup.manifest"
 
-IDD_SETUP DIALOGEX 0, 0, 300, 380
+IDD_SETUP DIALOGEX 0, 0, 300, 397
 STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX
 CAPTION "ひらがなIMEの設定"
 FONT 9, "Yu Gothic UI", 400, 0, 0x80
 BEGIN
-    GROUPBOX        "キーボード", -1, 7, 7, 286, 78
+    GROUPBOX        "キーボード", -1, 7, 7, 286, 95
     LTEXT           "入力", -1, 16, 22, 80, 10
     COMBOBOX        IDC_LAYOUT, 100, 20, 184, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "キーボードの種類", -1, 16, 39, 80, 10
     COMBOBOX        IDC_KEYBOARD, 100, 37, 184, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    AUTOCHECKBOX    "'nn'をかならず「ん」に変換する", IDC_NN, 16, 55, 268, 10
-    AUTOCHECKBOX    "右Altキー(AltGr)で記号やアクセント付きの文字を入力する", IDC_ALTGR, 16, 69, 268, 10
+    LTEXT           "キーの入れかえ", -1, 16, 56, 80, 10
+    COMBOBOX        IDC_KEY_SWAP, 100, 54, 184, 120, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    AUTOCHECKBOX    "'nn'をかならず「ん」に変換する", IDC_NN, 16, 72, 268, 10
+    AUTOCHECKBOX    "右Altキー(AltGr)で記号やアクセント付きの文字を入力する", IDC_ALTGR, 16, 86, 268, 10
 
-    GROUPBOX        "辞書", -1, 7, 90, 286, 92
-    LTEXT           "漢字辞書", -1, 16, 105, 80, 10
-    COMBOBOX        IDC_DICTIONARY, 100, 103, 184, 120, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "個人用辞書名", -1, 16, 123, 80, 10
-    EDITTEXT        IDC_USER_DICTIONARY, 100, 121, 130, 13, ES_AUTOHSCROLL
-    PUSHBUTTON      "編集...", IDC_EDIT_USER_DICTIONARY, 234, 120, 50, 15
-    AUTOCHECKBOX    "おくりがなの「許容」をつかう", IDC_PERMISSIBLE, 16, 142, 268, 10
-    LTEXT           "入力履歴", -1, 16, 162, 80, 10
-    PUSHBUTTON      "クリア...", IDC_CLEAR_HISTORY, 100, 159, 60, 15
+    GROUPBOX        "辞書", -1, 7, 107, 286, 92
+    LTEXT           "漢字辞書", -1, 16, 122, 80, 10
+    COMBOBOX        IDC_DICTIONARY, 100, 120, 184, 120, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "個人用辞書名", -1, 16, 140, 80, 10
+    EDITTEXT        IDC_USER_DICTIONARY, 100, 138, 130, 13, ES_AUTOHSCROLL
+    PUSHBUTTON      "編集...", IDC_EDIT_USER_DICTIONARY, 234, 137, 50, 15
+    AUTOCHECKBOX    "おくりがなの「許容」をつかう", IDC_PERMISSIBLE, 16, 159, 268, 10
+    LTEXT           "入力履歴", -1, 16, 179, 80, 10
+    PUSHBUTTON      "クリア...", IDC_CLEAR_HISTORY, 100, 176, 60, 15
 
-    GROUPBOX        "入力アシスト", -1, 7, 187, 286, 56
-    AUTOCHECKBOX    "算用数字をいつも半角で入力する", IDC_HALF_WIDTH_DIGITS, 16, 200, 268, 10
-    AUTOCHECKBOX    "英数モードで、'^'を直前の母音字に結合する", IDC_CIRCUMFLEX, 16, 214, 268, 10
-    AUTOCHECKBOX    "英数モードで、'~'を直前の母音字に'¯'として結合する", IDC_MACRON, 16, 228, 268, 10
+    GROUPBOX        "入力アシスト", -1, 7, 204, 286, 56
+    AUTOCHECKBOX    "算用数字をいつも半角で入力する", IDC_HALF_WIDTH_DIGITS, 16, 217, 268, 10
+    AUTOCHECKBOX    "英数モードで、'^'を直前の母音字に結合する", IDC_CIRCUMFLEX, 16, 231, 268, 10
+    AUTOCHECKBOX    "英数モードで、'~'を直前の母音字に'¯'として結合する", IDC_MACRON, 16, 245, 268, 10
 
-    GROUPBOX        "大規模言語モデル (LLM)", -1, 7, 248, 286, 58
-    AUTOCHECKBOX    "変換候補の選択にLLMを利用する", IDC_USE_LLM, 16, 261, 268, 10
-    AUTOCHECKBOX    "LLMの計算にCUDAを利用する", IDC_USE_CUDA, 16, 275, 268, 10
-    LTEXT           "", IDC_LLM_STATUS, 16, 291, 180, 10
-    PUSHBUTTON      "必要なファイルを入手...", IDC_GET_LLM, 200, 288, 84, 15
+    GROUPBOX        "大規模言語モデル (LLM)", -1, 7, 265, 286, 58
+    AUTOCHECKBOX    "変換候補の選択にLLMを利用する", IDC_USE_LLM, 16, 278, 268, 10
+    AUTOCHECKBOX    "LLMの計算にCUDAを利用する", IDC_USE_CUDA, 16, 292, 268, 10
+    LTEXT           "", IDC_LLM_STATUS, 16, 308, 180, 10
+    PUSHBUTTON      "必要なファイルを入手...", IDC_GET_LLM, 200, 305, 84, 15
 
-    GROUPBOX        "その他", -1, 7, 311, 286, 44
-    LTEXT           "はじめの入力モード", -1, 16, 325, 80, 10
-    COMBOBOX        IDC_MODE, 100, 323, 184, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
-    LTEXT           "ログ", -1, 16, 340, 80, 10
-    COMBOBOX        IDC_LOGGING, 100, 338, 184, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "その他", -1, 7, 328, 286, 44
+    LTEXT           "はじめの入力モード", -1, 16, 342, 80, 10
+    COMBOBOX        IDC_MODE, 100, 340, 184, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "ログ", -1, 16, 357, 80, 10
+    COMBOBOX        IDC_LOGGING, 100, 355, 184, 80, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
 
-    DEFPUSHBUTTON   "OK", IDOK, 129, 361, 50, 14
-    PUSHBUTTON      "キャンセル", IDCANCEL, 185, 361, 50, 14
-    PUSHBUTTON      "適用", IDC_APPLY, 241, 361, 50, 14
+    DEFPUSHBUTTON   "OK", IDOK, 129, 378, 50, 14
+    PUSHBUTTON      "キャンセル", IDCANCEL, 185, 378, 50, 14
+    PUSHBUTTON      "適用", IDC_APPLY, 241, 378, 50, 14
 END

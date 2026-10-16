@@ -773,10 +773,13 @@ BOOL TextService::handle_key(ITfContext* context, WPARAM wparam, LPARAM lparam, 
     if (direct_hwnd_) leave_direct();
     if (!context_accepts_input(context)) return FALSE;
     KeyEvent k = translate_key(wparam, lparam, release, xkb());
+    // The application must not get a swapped key the engine leaves: it is
+    // not the key the user meant.
+    BOOL swapped = swap_key(wparam, release, k) && !release;
     bool caps_release = k.keyval == keysym::Caps_Lock && release && engine_->is_onoff_by_caps();
     if (!caps_release && engine_->is_trivial_key(k.keyval, k.keycode, k.state)) {
         engine_->note_trivial_key(k.keyval, k.keycode, k.state);
-        return FALSE;
+        return swapped;
     }
     TF_STATUS status = {};
     context->GetStatus(&status);
@@ -801,7 +804,24 @@ BOOL TextService::handle_key(ITfContext* context, WPARAM wparam, LPARAM lparam, 
         LOG_WARNING("RequestEditSession failed: %#lx", static_cast<unsigned long>(hr));
         return FALSE;
     }
-    return eaten ? TRUE : FALSE;
+    return eaten || swapped ? TRUE : FALSE;
+}
+
+bool TextService::swap_key(WPARAM wparam, bool release, KeyEvent& k) {
+    if (release) {
+        // The release of a key swapped when it was pressed, whatever the mode is now.
+        if (swapped_keys_.erase(wparam) == 0) return false;
+        return tsf::swap_key(k, settings_.key_swaps);
+    }
+    swapped_keys_.erase(wparam);
+    if (settings_.key_swaps.empty()) return false;
+    // In the alphanumeric mode the keys keep their own roles, and so do the
+    // shortcuts with Ctrl or Alt.
+    if (k.state & (keysym::CONTROL_MASK | keysym::MOD1_MASK)) return false;
+    if (!engine_->is_enabled() && !engine_->has_pending_input()) return false;
+    if (!tsf::swap_key(k, settings_.key_swaps)) return false;
+    swapped_keys_.insert(wparam);
+    return true;
 }
 
 direct::DirectClient* TextService::direct_client() {
@@ -854,10 +874,11 @@ BOOL TextService::handle_direct_key(HWND hwnd, direct::DirectClient* client, WPA
         if (!client) return FALSE;
     }
     KeyEvent k = translate_key(wparam, lparam, release, xkb());
+    BOOL swapped = swap_key(wparam, release, k) && !release;
     bool caps_release = k.keyval == keysym::Caps_Lock && release && engine_->is_onoff_by_caps();
     if (!caps_release && engine_->is_trivial_key(k.keyval, k.keycode, k.state)) {
         engine_->note_trivial_key(k.keyval, k.keycode, k.state);
-        return FALSE;
+        return swapped;
     }
     bool eaten = false;
     run_direct(client, [&] {
@@ -870,7 +891,7 @@ BOOL TextService::handle_direct_key(HWND hwnd, direct::DirectClient* client, WPA
             eaten = engine_->process_key_event(k.keyval, k.keycode, k.state);
         }
     });
-    return eaten ? TRUE : FALSE;
+    return eaten || swapped ? TRUE : FALSE;
 }
 
 void __stdcall TextService::Host::Reset(direct::DirectClient* client) {

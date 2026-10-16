@@ -20,6 +20,8 @@
 
 #include <cstdint>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "Keysyms.h"
 
@@ -33,6 +35,10 @@ struct KeyEvent {
 
 // Translates a WM_KEYDOWN/WM_KEYUP for the engine. xkb is "us" or "jp".
 KeyEvent translate_key(WPARAM vk, LPARAM lparam, bool release, const std::string& xkb);
+
+// Swaps the key of e by the pairs of key names of the key-swaps setting
+// (space, Henkan, Muhenkan, Hiragana_Katakana); returns true if it did.
+bool swap_key(KeyEvent& e, const std::vector<std::pair<std::string, std::string>>& swaps);
 
 // The keyboard type for layouts/<layout>.<xkb>.json when the setting is "auto".
 std::string detect_xkb();

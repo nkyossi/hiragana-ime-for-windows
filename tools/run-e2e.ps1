@@ -3,17 +3,20 @@
 # FuriganaPad. They type with SendInput; do not touch the keyboard or the
 # mouse while they run.
 #
-#   powershell -ExecutionPolicy Bypass -File tools\run-e2e.ps1 [-Modes richedit,edit,furiganapad] [-Llm]
+#   powershell -ExecutionPolicy Bypass -File tools\run-e2e.ps1 [-Modes richedit,edit,furiganapad] [-Llm] [-SwapKeys]
 #
 # The settings and the input history of the current user are saved first and
 # restored afterwards; the tests use the romaji layout. -Llm turns use-llm on,
 # so that the text service starts hiragana-llm.exe of the build directory (the
-# model must be in %LOCALAPPDATA%\HiraganaIME\llm).
+# model must be in %LOCALAPPDATA%\HiraganaIME\llm). -SwapKeys checks the
+# key-swaps setting (space <-> Henkan) with the Japanese keyboard layout in a
+# RichEdit control only.
 
 param(
     [string[]] $Modes = @('richedit', 'edit', 'furiganapad'),
     [string] $BuildDir = (Join-Path $env:LOCALAPPDATA 'HiraganaIME-build\x64'),
-    [switch] $Llm
+    [switch] $Llm,
+    [switch] $SwapKeys
 )
 
 $ErrorActionPreference = 'Stop'
@@ -41,6 +44,15 @@ try {
     $settings['layout'] = 'roomazi'
     $settings['keyboard'] = 'auto'
     $settings['use-llm'] = [bool] $Llm
+    if ($SwapKeys) {
+        $Modes = @('richedit')
+        $settings['keyboard'] = 'jp'
+        $settings['key-swaps'] = @(, @('space', 'Henkan'))
+        $env:HIRAGANA_E2E_SWAP = '1'
+    } else {
+        $settings['key-swaps'] = @()
+        $env:HIRAGANA_E2E_SWAP = ''
+    }
     if ($env:HIRAGANA_E2E_DEBUG) { $settings['logging-level'] = 'DEBUG' }
     ($settings | ConvertTo-Json) | Set-Content -Encoding ascii $settingsPath
     if ($Llm) {

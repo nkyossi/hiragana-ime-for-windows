@@ -181,6 +181,37 @@ KeyEvent translate_key(WPARAM wparam, LPARAM lparam, bool release, const std::st
     return e;
 }
 
+bool swap_key(KeyEvent& e, const std::vector<std::pair<std::string, std::string>>& swaps) {
+    struct Key {
+        const char* name;
+        Keysym keyval;
+        uint32_t keycode;  // evdev
+    };
+    static const Key keys[] = {
+        {"space", space, 57},
+        {"Henkan", Henkan, 92},
+        {"Muhenkan", Muhenkan, 94},
+        {"Hiragana_Katakana", Hiragana_Katakana, 93},
+    };
+    auto find = [](const std::string& name) -> const Key* {
+        for (const Key& k : keys) {
+            if (name == k.name) return &k;
+        }
+        return nullptr;
+    };
+    for (const auto& [a, b] : swaps) {
+        const Key* ka = find(a);
+        const Key* kb = find(b);
+        if (!ka || !kb || ka == kb) continue;
+        const Key* to = e.keyval == ka->keyval ? kb : e.keyval == kb->keyval ? ka : nullptr;
+        if (!to) continue;
+        e.keyval = to->keyval;
+        e.keycode = to->keycode;
+        return true;
+    }
+    return false;
+}
+
 std::string detect_xkb() {
     // The keyboard driver of the Japanese layout: kbd106.dll or kbd101.dll.
     wchar_t driver[64] = {};

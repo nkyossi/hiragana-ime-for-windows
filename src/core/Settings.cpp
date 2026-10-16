@@ -72,6 +72,14 @@ Settings Settings::load(const fs::path& path) {
     boolean("combining-macron", s.combining_macron);
     boolean("use-llm", s.use_llm);
     boolean("use-cuda", s.use_cuda);
+    if (v["key-swaps"].is_array()) {
+        for (const json::Value& pair : v["key-swaps"].as_array()) {
+            if (!pair.is_array() || pair.as_array().size() != 2) continue;
+            const json::Value& a = pair.as_array()[0];
+            const json::Value& b = pair.as_array()[1];
+            if (a.is_string() && b.is_string()) s.key_swaps.emplace_back(a.as_string(), b.as_string());
+        }
+    }
     str("logging-level", s.logging_level);
     if (v["history-generation"].is_number())
         s.history_generation = static_cast<long long>(v["history-generation"].as_number());
@@ -93,6 +101,9 @@ bool Settings::save(const fs::path& path) const {
     v.set("combining-macron", combining_macron);
     v.set("use-llm", use_llm);
     v.set("use-cuda", use_cuda);
+    json::Value::Array swaps;
+    for (const auto& [a, b] : key_swaps) swaps.push_back(json::Value(json::Value::Array{json::Value(a), json::Value(b)}));
+    v.set("key-swaps", json::Value(std::move(swaps)));
     v.set("logging-level", logging_level);
     v.set("history-generation", history_generation);
     std::error_code ec;

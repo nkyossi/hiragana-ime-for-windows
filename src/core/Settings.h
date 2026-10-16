@@ -21,6 +21,8 @@
 
 #include <filesystem>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace hiragana {
 
@@ -39,6 +41,10 @@ struct Settings {
     // LLM-assisted conversion (settings keys use-llm and use-cuda of the original).
     bool use_llm = false;
     bool use_cuda = false;
+    // Pairs of keys (keysym names: space, Henkan, Muhenkan, Hiragana_Katakana)
+    // that trade places while the input mode is not alphanumeric, e.g.
+    // {"space", "Henkan"} to convert with the space bar of a 109 keyboard.
+    std::vector<std::pair<std::string, std::string>> key_swaps;
     std::string logging_level = "WARNING";
     // Incremented by the setup program after it has cleared the input history.
     long long history_generation = 0;

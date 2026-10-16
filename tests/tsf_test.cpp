@@ -37,6 +37,12 @@ const bool g_llm = [] {
     return GetEnvironmentVariableA("HIRAGANA_E2E_LLM", buffer, sizeof buffer) == 1 && buffer[0] == '1';
 }();
 const wchar_t* kyou() { return g_llm ? L"強" : L"今日"; }
+// tools/run-e2e.ps1 -SwapKeys: roomazi.jp, where 変換 converts and the space
+// bar types "　", with the key-swaps setting space <-> Henkan.
+const bool g_swap = [] {
+    char buffer[8];
+    return GetEnvironmentVariableA("HIRAGANA_E2E_SWAP", buffer, sizeof buffer) == 1 && buffer[0] == '1';
+}();
 
 std::string utf8(const std::wstring& w) {
     if (w.empty()) return {};
@@ -153,6 +159,30 @@ void run_tests(bool richedit) {
     }
     expect2("mode: hiragana", L"あ", L"");
     clear();
+
+    if (g_swap) {
+        type("kanji");
+        tap(VK_SPACE);  // as 変換
+        tap(VK_RETURN);
+        expect("swap: the space bar converts", L"漢字");
+        clear();
+        tap(VK_CONVERT, false, 0x79);  // as the space bar
+        expect("swap: henkan types a space", L"　");
+        clear();
+        // The keys keep their own roles in the alphanumeric mode.
+        tap(used_caps ? VK_CAPITAL : VK_KANJI);
+        Sleep(300);
+        type("a");
+        tap(VK_SPACE);
+        type("b");
+        expect("swap: alphanumeric mode keeps the space bar", L"a b");
+        clear();
+        if (((GetKeyState(VK_CAPITAL) & 1) != 0) != caps_before) tap(VK_CAPITAL);
+        std::printf("%s: %d failure(s)\n", richedit ? "richedit" : "edit", g_failures);
+        std::fflush(stdout);
+        PostMessageW(g_main, WM_CLOSE, 0, 0);
+        return;
+    }
 
     type("kanji");
     expect2("romaji", L"かんじ", L"");                // かんじ

@@ -52,6 +52,25 @@ const std::pair<const wchar_t*, const char*> kKeyboards[] = {
     {L"英語キーボード (Dvorak)", "us+dvorak"},
 };
 
+// The key-swaps setting: the keys trade places while the input mode is not
+// alphanumeric.
+struct KeySwap {
+    const wchar_t* label;
+    const char* a;
+    const char* b;
+};
+const KeySwap kKeySwaps[] = {
+    {L"なし", nullptr, nullptr},
+    {L"スペース ⇔ 変換", "space", "Henkan"},
+    {L"スペース ⇔ 無変換", "space", "Muhenkan"},
+    {L"スペース ⇔ カタカナ/ひらがな", "space", "Hiragana_Katakana"},
+    {L"変換 ⇔ 無変換", "Henkan", "Muhenkan"},
+    {L"変換 ⇔ カタカナ/ひらがな", "Henkan", "Hiragana_Katakana"},
+    {L"無変換 ⇔ カタカナ/ひらがな", "Muhenkan", "Hiragana_Katakana"},
+};
+// The index in the combo box for key swaps set by hand in settings.json.
+constexpr int kCustomKeySwap = static_cast<int>(std::size(kKeySwaps));
+
 const std::pair<const wchar_t*, const char*> kDictionaries[] = {
     {L"小学校１年生", "restrained.1.dic"}, {L"小学校２年生", "restrained.2.dic"},
     {L"小学校３年生", "restrained.3.dic"}, {L"小学校４年生", "restrained.4.dic"},
@@ -240,6 +259,7 @@ private:
     void load_controls() {
         fill(IDC_LAYOUT, kLayouts, settings_.layout);
         fill(IDC_KEYBOARD, kKeyboards, settings_.keyboard);
+        fill_key_swap();
         fill(IDC_DICTIONARY, kDictionaries, settings_.dictionary);
         fill(IDC_MODE, kModes, settings_.mode);
         fill(IDC_LOGGING, kLoggingLevels, settings_.logging_level);
@@ -260,6 +280,11 @@ private:
         Settings s = Settings::load(settings_path());
         s.layout = selected(IDC_LAYOUT, kLayouts);
         s.keyboard = selected(IDC_KEYBOARD, kKeyboards);
+        LRESULT swap = SendDlgItemMessageW(hwnd_, IDC_KEY_SWAP, CB_GETCURSEL, 0, 0);
+        if (0 <= swap && swap < kCustomKeySwap) {
+            s.key_swaps.clear();
+            if (kKeySwaps[swap].a) s.key_swaps.emplace_back(kKeySwaps[swap].a, kKeySwaps[swap].b);
+        }
         s.dictionary = selected(IDC_DICTIONARY, kDictionaries);
         s.mode = selected(IDC_MODE, kModes);
         s.logging_level = selected(IDC_LOGGING, kLoggingLevels);
@@ -293,6 +318,22 @@ private:
         grant_app_containers_read(user_data_dir());
         settings_ = s;
         return true;
+    }
+
+    void fill_key_swap() {
+        HWND combo = GetDlgItem(hwnd_, IDC_KEY_SWAP);
+        int current = settings_.key_swaps.empty() ? 0 : kCustomKeySwap;
+        for (int i = 0; i < kCustomKeySwap; ++i) {
+            SendMessageW(combo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(kKeySwaps[i].label));
+            if (settings_.key_swaps.size() == 1 && kKeySwaps[i].a) {
+                const auto& [a, b] = settings_.key_swaps[0];
+                if ((a == kKeySwaps[i].a && b == kKeySwaps[i].b) || (a == kKeySwaps[i].b && b == kKeySwaps[i].a))
+                    current = i;
+            }
+        }
+        if (current == kCustomKeySwap)
+            SendMessageW(combo, CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(L"そのほか (settings.json の設定)"));
+        SendMessageW(combo, CB_SETCURSEL, current, 0);
     }
 
     void update_llm_controls() {
