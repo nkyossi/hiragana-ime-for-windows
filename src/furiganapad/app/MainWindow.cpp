@@ -55,6 +55,8 @@ enum Command : int {
     ID_REDO,
     ID_CUT,
     ID_COPY,
+    ID_COPY_NOTE,
+    ID_COPY_HTML,
     ID_PASTE,
     ID_SELECTALL,
     ID_UNSELECT,
@@ -179,6 +181,8 @@ void MainWindow::create_menu() {
     AppendMenuW(edit, MF_SEPARATOR, 0, nullptr);
     AppendMenuW(edit, MF_STRING, ID_CUT, L"切り取り(&T)\tCtrl+X");
     AppendMenuW(edit, MF_STRING, ID_COPY, L"コピー(&C)\tCtrl+C");
+    AppendMenuW(edit, MF_STRING, ID_COPY_NOTE, L"ルビつきでコピー (note 記法)(&N)\tCtrl+Shift+C");
+    AppendMenuW(edit, MF_STRING, ID_COPY_HTML, L"ルビつきでコピー (HTML)(&M)");
     AppendMenuW(edit, MF_STRING, ID_PASTE, L"貼り付け(&P)\tCtrl+V");
     AppendMenuW(edit, MF_SEPARATOR, 0, nullptr);
     AppendMenuW(edit, MF_STRING, ID_SELECTALL, L"すべて選択(&A)\tCtrl+A");
@@ -352,6 +356,12 @@ void MainWindow::on_command(int id) {
                 SendMessageW(edit, WM_COPY, 0, 0);
             else
                 view_->copy();
+            break;
+        case ID_COPY_NOTE:
+            view_->copy_with_ruby(FuriganaView::RubyNotation::Note);
+            break;
+        case ID_COPY_HTML:
+            view_->copy_with_ruby(FuriganaView::RubyNotation::Html);
             break;
         case ID_PASTE:
             if (edit)
@@ -780,6 +790,7 @@ App::App() {
         {FCONTROL | FVIRTKEY, 'Y', ID_REDO},
         {FCONTROL | FVIRTKEY, 'X', ID_CUT},
         {FCONTROL | FVIRTKEY, 'C', ID_COPY},
+        {FCONTROL | FSHIFT | FVIRTKEY, 'C', ID_COPY_NOTE},
         {FCONTROL | FVIRTKEY, 'V', ID_PASTE},
         {FCONTROL | FVIRTKEY, 'A', ID_SELECTALL},
         {FCONTROL | FVIRTKEY, VK_OEM_5, ID_UNSELECT},

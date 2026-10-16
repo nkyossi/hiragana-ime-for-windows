@@ -14,6 +14,11 @@
 
 ふりがなパッドでは、ひらがなIMEで漢字に変換すると、もとのよみをルビとして自動でつけます。Markdown（`.md`）形式の文書をよみかきすることもできます。
 
+「編集」メニューの「ルビつきでコピー」では、ルビをつけたままほかのアプリにはりつけられます。えらんだ範囲（えらんでいないときは文書全体）をコピーします。
+
+- **note 記法**（Ctrl+Shift+C）：`|漢字《かんじ》` の形でコピーします。note や小説投稿サイトでつかえます。
+- **HTML**：`<ruby>漢字<rp>(</rp><rt>かんじ</rt><rp>)</rp></ruby>` の形でコピーします。Word などにはりつけると、ルビつきの文字になります。
+
 ## インストール
 
 1. [Releases](https://github.com/nkyossi/hiragana-ime-for-windows/releases) から `HiraganaIME-for-Windows-<版>.zip` をダウンロードし、展開します。
@@ -283,7 +288,7 @@ ONNX Runtime には32bit版の配布物がありません。そのため、`hira
 
 - **辞書**：SKK-JISYO（GPLv2）、EDICT2 / katakana.dic（CC BY-SA 3.0）
 
-くわしくは、次のファイルを読んでください。
+くわしくは、次のファイルをよんでください。
 
 - `ibus-hiragana/LICENSE`
 - `ibus-hiragana/NOTICE`
@@ -293,7 +298,7 @@ ONNX Runtime には32bit版の配布物がありません。そのため、`hira
 
 Esrille のロゴはつかっていません。
 
-LLMによる候補えらびでは、さらに次のものをつかいます。これらは、いずれもこのリポジトリにははいっていません。インストール先には、ONNX Runtime と MeCab のライセンス文書も置きます。
+LLMによる候補えらびでは、さらに次のものをつかいます。これらは、いずれもこのリポジトリにははいっていません。インストール先には、ONNX Runtime と MeCab のライセンス文書もおきます。
 
 - ONNX Runtime：MIT License（Microsoft）
 - MeCab：BSD（`third_party/mecab-win/BSD` を参照）

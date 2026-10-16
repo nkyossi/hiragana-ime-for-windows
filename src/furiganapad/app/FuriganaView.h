@@ -73,6 +73,10 @@ public:
     void redo();
     void cut();
     void copy();
+    // Copies the selection, or the whole text without one, with the rubies
+    // written as |漢字《かんじ》 (note) or as HTML.
+    enum class RubyNotation { Note, Html };
+    void copy_with_ruby(RubyNotation notation);
     void paste();
     void select_all(bool select);
     void insert_newline();

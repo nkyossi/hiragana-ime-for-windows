@@ -10,6 +10,7 @@
 #include "InputContext.h"
 #include "Keysyms.h"
 #include "Markdown.h"
+#include "RubyExport.h"
 #include "Test.h"
 #include "TextBuffer.h"
 
@@ -172,6 +173,28 @@ TEST(fp_markdown_conversion) {
     EXPECT_EQ(markdown_to_annotated(U"<ruby><rb>漢</rb><rt>かん</rt><rb>字</rb><rt>じ</rt></ruby>"),
               ruby(U"漢", U"かん") + ruby(U"字", U"じ"));
     EXPECT_EQ(markdown_to_annotated(U"a <ruby>broken"), ustring(U"a <ruby>broken"));
+}
+
+TEST(fp_copy_with_ruby) {
+    using namespace furiganapad;
+    ustring text = ruby(U"今日", U"きょう") + U"は<" + ruby(U"漢字", U"かんじ") + U">&\n2行め";
+    EXPECT_EQ(to_note_ruby(text), ustring(U"|今日《きょう》は<|漢字《かんじ》>&\n2行め"));
+    EXPECT_EQ(to_html_ruby(text),
+              ustring(U"<ruby>今日<rp>(</rp><rt>きょう</rt><rp>)</rp></ruby>は&lt;"
+                      U"<ruby>漢字<rp>(</rp><rt>かんじ</rt><rp>)</rp></ruby>&gt;&amp;<br>\n2行め"));
+    // A broken annotation is copied without its marks.
+    EXPECT_EQ(to_note_ruby(ustring(1, IAA) + U"漢字" + ustring(1, IAS) + U"かん"), ustring(U"漢字かん"));
+
+    // CF_HTML: the offsets point at the fragment.
+    std::string fragment = "<ruby>漢<rt>かん</rt></ruby>";
+    std::string data = make_cf_html(fragment);
+    auto offset = [&](const char* key) {
+        size_t at = data.find(key);
+        return at == std::string::npos ? std::string::npos : std::stoul(data.substr(at + std::strlen(key), 10));
+    };
+    EXPECT_EQ(data.substr(offset("StartFragment:"), offset("EndFragment:") - offset("StartFragment:")), fragment);
+    EXPECT_EQ(data.substr(offset("StartHTML:"), 6), std::string("<html>"));
+    EXPECT_EQ(offset("EndHTML:"), data.size());
 }
 
 TEST(fp_markdown_styles) {

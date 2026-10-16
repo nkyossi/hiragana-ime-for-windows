@@ -37,6 +37,7 @@ add_library(furiganapad_core STATIC
     src/furiganapad/core/TextBuffer.cpp
     src/furiganapad/core/InputContext.cpp
     src/furiganapad/core/Markdown.cpp
+    src/furiganapad/core/RubyExport.cpp
 )
 target_include_directories(furiganapad_core PUBLIC src/furiganapad/core)
 # ICU of Windows 10 version 1903 or later

@@ -24,6 +24,8 @@
 #include <algorithm>
 #include <cmath>
 
+#include "RubyExport.h"
+
 using Microsoft::WRL::ComPtr;
 
 namespace furiganapad {
@@ -800,7 +802,17 @@ void FuriganaView::redo() {
     place_cursor_onscreen();
 }
 
-static void set_clipboard(HWND hwnd, const ustring& text) {
+static void put_clipboard_data(UINT format, const void* data, size_t size) {
+    HGLOBAL mem = GlobalAlloc(GMEM_MOVEABLE, size);
+    if (!mem) return;
+    void* p = GlobalLock(mem);
+    memcpy(p, data, size);
+    GlobalUnlock(mem);
+    if (!SetClipboardData(format, mem)) GlobalFree(mem);
+}
+
+// html: also put it as "HTML Format" so that word processors paste the rubies.
+static void set_clipboard(HWND hwnd, const ustring& text, const std::string* html = nullptr) {
     std::wstring w;
     for (wchar_t c : to_wide(text)) {
         if (c == L'\n') w += L'\r';
@@ -808,12 +820,11 @@ static void set_clipboard(HWND hwnd, const ustring& text) {
     }
     if (!OpenClipboard(hwnd)) return;
     EmptyClipboard();
-    HGLOBAL mem = GlobalAlloc(GMEM_MOVEABLE, (w.size() + 1) * sizeof(wchar_t));
-    if (mem) {
-        void* p = GlobalLock(mem);
-        memcpy(p, w.c_str(), (w.size() + 1) * sizeof(wchar_t));
-        GlobalUnlock(mem);
-        if (!SetClipboardData(CF_UNICODETEXT, mem)) GlobalFree(mem);
+    put_clipboard_data(CF_UNICODETEXT, w.c_str(), (w.size() + 1) * sizeof(wchar_t));
+    if (html) {
+        static const UINT cf_html = RegisterClipboardFormatW(L"HTML Format");
+        std::string data = make_cf_html(*html);
+        put_clipboard_data(cf_html, data.c_str(), data.size() + 1);
     }
     CloseClipboard();
 }
@@ -827,6 +838,22 @@ void FuriganaView::cut() {
 void FuriganaView::copy() {
     request_commit();
     if (auto text = buffer_.copy_clipboard()) set_clipboard(hwnd_, *text);
+}
+
+void FuriganaView::copy_with_ruby(RubyNotation notation) {
+    request_commit();
+    std::optional<ustring> text = buffer_.copy_clipboard();
+    if (!text) {
+        auto [start, end] = buffer_.get_bounds();
+        text = remove_dangling_annotations(buffer_.get_text(start, end, true));
+    }
+    if (notation == RubyNotation::Note) {
+        set_clipboard(hwnd_, to_note_ruby(*text));
+    } else {
+        ustring html = to_html_ruby(*text);
+        std::string utf8 = to_utf8(html);
+        set_clipboard(hwnd_, html, &utf8);
+    }
 }
 
 void FuriganaView::paste() {
