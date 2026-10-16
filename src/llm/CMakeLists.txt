@@ -16,7 +16,7 @@ add_custom_command(TARGET hiragana-llm POST_BUILD
         $<TARGET_FILE_DIR:hiragana-llm>/data)
 target_compile_definitions(hiragana-llm PRIVATE
     HIRAGANA_VERSION_STR="${PROJECT_VERSION}"
-    HIRAGANA_VERSION_RC=${PROJECT_VERSION_MAJOR},${PROJECT_VERSION_MINOR},${PROJECT_VERSION_PATCH},0)
+    HIRAGANA_VERSION_RC=${PROJECT_VERSION_MAJOR},${PROJECT_VERSION_MINOR},${PROJECT_VERSION_PATCH},${PROJECT_VERSION_TWEAK})
 # The script that gets the model and unidic-lite (see the setup program).
 add_custom_command(TARGET hiragana-llm POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different

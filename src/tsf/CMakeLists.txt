@@ -16,7 +16,7 @@ target_link_libraries(hiragana-ime PRIVATE hiragana_core ole32 oleaut32 uuid use
 target_compile_definitions(hiragana-ime PRIVATE
     HIRAGANA_VERSION_W=L"${PROJECT_VERSION}"
     HIRAGANA_VERSION_STR="${PROJECT_VERSION}"
-    HIRAGANA_VERSION_RC=${PROJECT_VERSION_MAJOR},${PROJECT_VERSION_MINOR},${PROJECT_VERSION_PATCH},0)
+    HIRAGANA_VERSION_RC=${PROJECT_VERSION_MAJOR},${PROJECT_VERSION_MINOR},${PROJECT_VERSION_PATCH},${PROJECT_VERSION_TWEAK})
 # The core library is linked into a DLL.
 set_target_properties(hiragana_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
